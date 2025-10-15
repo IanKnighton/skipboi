@@ -24,7 +24,23 @@ A simple macOS CLI that allows you to start, stop, and skip songs playing in App
 
 ## Installation
 
+### Using Homebrew (Recommended)
+
+The easiest way to install skipboi is through Homebrew:
+
+```bash
+brew tap IanKnighton/skipboi
+brew install skipboi
+```
+
+To update to the latest version:
+```bash
+brew upgrade skipboi
+```
+
 ### Building from Source
+
+If you prefer to build from source:
 
 1. Clone the repository:
 ```bash
@@ -153,6 +169,21 @@ MIT License - see [LICENSE](LICENSE) file for details.
 Ian Knighton
 
 ## Troubleshooting
+
+### Homebrew installation issues
+
+If you encounter issues installing via Homebrew:
+
+```bash
+# Update Homebrew
+brew update
+
+# Verify the tap
+brew tap-info IanKnighton/skipboi
+
+# Try reinstalling
+brew reinstall skipboi
+```
 
 ### Apple Music not responding
 
