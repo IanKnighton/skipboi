@@ -106,8 +106,7 @@ struct Skipboi {
             pause               Pause the current track
             playpause, toggle   Toggle between play and pause
             next, skip, forward Skip to the next track
-            previous, prev,     Go to the previous track
-            back, backward
+            previous, prev, back, backward   Go to the previous track
             help, -h, --help    Show this help message
         
         Examples:
