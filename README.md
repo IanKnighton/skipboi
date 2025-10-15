@@ -19,7 +19,7 @@ A simple macOS CLI that allows you to start, stop, and skip songs playing in App
 ## Requirements
 
 - macOS 10.15 (Catalina) or later
-- Swift 6.0 or later (for building from source)
+- Swift 6.2 or later (for building from source)
 - Apple Music app installed
 
 ## Installation
