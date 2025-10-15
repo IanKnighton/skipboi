@@ -29,7 +29,7 @@ A simple macOS CLI that allows you to start, stop, and skip songs playing in App
 
 ### Using Homebrew (Recommended)
 
-The easiest way to install skipboi is through Homebrew:
+The easiest way to install skipboi is through Homebrew. Starting with version 1.2.0, pre-compiled bottles are available for faster installation:
 
 ```bash
 brew tap IanKnighton/homebrew-tap
@@ -41,6 +41,12 @@ To update to the latest version:
 ```bash
 brew upgrade skipboi
 ```
+
+**Benefits of Homebrew installation:**
+- ⚡ **Fast installation** with pre-compiled bottles (no compilation required)
+- 🔄 **Easy updates** with `brew upgrade`
+- 🛡️ **Automatic dependency management**
+- ✅ **Version verification** built-in
 
 ### Building from Source
 

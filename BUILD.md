@@ -1,6 +1,75 @@
 # Build System Documentation
 
-This document explains how version information is handled in the `skipboi` build system.
+This document explains how version information and Homebrew bottles are hand### Testing Version Embedding
+
+```bash
+# Build with version
+SKIPBOI_VERSION=v1.2.0 swift build -c release
+
+# Test without environment variable (should still show v1.2.0)
+unset SKIPBOI_VERSION
+.build/release/skipboi version
+```
+
+## Homebrew Bottle System
+
+### Bottle Structure
+
+Bottles follow Homebrew's expected directory structure:
+```
+skipboi/
+└── {version}/
+    └── bin/
+        └── skipboi (executable with embedded version)
+```
+
+### Bottle Generation Process
+
+1. **Build Binary**: Compile with `SKIPBOI_VERSION` set
+2. **Create Structure**: Place binary in bottle directory structure
+3. **Package**: Create tar.gz archives for each platform
+4. **Generate Variants**: Create platform-specific bottles:
+   - `arm64_sonoma` - Apple Silicon on macOS Sonoma
+   - `arm64_monterey` - Apple Silicon on macOS Monterey
+   - `x86_64_sonoma` - Intel on macOS Sonoma
+5. **Calculate Hashes**: Generate SHA256 for each bottle
+6. **Upload**: Attach to GitHub release
+
+### Testing Bottle Generation
+
+Use the included test script:
+```bash
+./test-bottle.sh
+```
+
+This script:
+- Builds a test binary with version embedding
+- Creates bottle structure and packages
+- Verifies bottle extraction works
+- Tests the binary from the bottle
+- Cleans up test files
+
+### Manual Bottle Testing
+
+```bash
+# Build with version
+SKIPBOI_VERSION=v1.2.0 swift build -c release
+
+# Create bottle structure
+mkdir -p bottle-staging/skipboi/v1.2.0/bin
+cp .build/release/skipboi bottle-staging/skipboi/v1.2.0/bin/
+
+# Package bottle
+cd bottle-staging
+tar -czf ../skipboi-v1.2.0.arm64_sonoma.bottle.tar.gz .
+cd ..
+
+# Test extraction
+mkdir bottle-test
+cd bottle-test
+tar -xzf ../skipboi-v1.2.0.arm64_sonoma.bottle.tar.gz
+./skipboi/v1.2.0/bin/skipboi version
+``` `skipboi` build system.
 
 ## Version Information Flow
 
@@ -16,6 +85,28 @@ Swift compilation with embedded version
 Binary with version information
     ↓
 skipboi version command
+```
+
+## Homebrew Bottle Flow
+
+```
+Git Tag (v1.1.1)
+    ↓
+GitHub Actions Build
+    ↓
+Create Binary with Version
+    ↓
+Package into Bottle Structure
+    ↓
+Generate Multiple Platform Bottles
+    ↓
+Calculate SHA256 Hashes
+    ↓
+Upload to GitHub Release
+    ↓
+Update Homebrew Formula
+    ↓
+Users install via bottles (fast!)
 ```
 
 ## Implementation Details
