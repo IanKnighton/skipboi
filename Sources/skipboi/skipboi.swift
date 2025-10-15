@@ -14,6 +14,11 @@ class MusicController {
         case nextTrack = "next track"
         case previousTrack = "previous track"
         case playPause = "playpause"
+        case shuffleOn = "set shuffle enabled to true"
+        case shuffleOff = "set shuffle enabled to false"
+        case repeatOff = "set song repeat to off"
+        case repeatOne = "set song repeat to one"
+        case repeatAll = "set song repeat to all"
     }
     
     /// Execute an AppleScript command for Apple Music
@@ -82,6 +87,31 @@ struct Skipboi {
             if success {
                 print("⏮️  Previous track")
             }
+        case "shuffle":
+            success = controller.execute(.shuffleOn)
+            if success {
+                print("🔀 Shuffle enabled")
+            }
+        case "shuffle-off", "shuffleoff", "noshuffle":
+            success = controller.execute(.shuffleOff)
+            if success {
+                print("➡️  Shuffle disabled")
+            }
+        case "repeat":
+            success = controller.execute(.repeatAll)
+            if success {
+                print("🔁 Repeat all enabled")
+            }
+        case "repeat-one", "repeatone", "repeat1":
+            success = controller.execute(.repeatOne)
+            if success {
+                print("🔂 Repeat one enabled")
+            }
+        case "repeat-off", "repeatoff", "norepeat":
+            success = controller.execute(.repeatOff)
+            if success {
+                print("➡️  Repeat disabled")
+            }
         case "help", "-h", "--help":
             showUsage()
             exit(0)
@@ -107,12 +137,19 @@ struct Skipboi {
             playpause, toggle   Toggle between play and pause
             next, skip, forward Skip to the next track
             previous, prev, back, backward   Go to the previous track
+            shuffle             Enable shuffle mode
+            shuffle-off, shuffleoff, noshuffle   Disable shuffle mode
+            repeat              Enable repeat all mode
+            repeat-one, repeatone, repeat1       Enable repeat one mode
+            repeat-off, repeatoff, norepeat      Disable repeat mode
             help, -h, --help    Show this help message
         
         Examples:
             skipboi play        # Start playing
             skipboi next        # Skip to next track
             skipboi pause       # Pause playback
+            skipboi shuffle     # Enable shuffle
+            skipboi repeat-one  # Enable repeat one
         """)
     }
 }
