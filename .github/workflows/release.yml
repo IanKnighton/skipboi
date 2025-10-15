@@ -43,19 +43,19 @@ jobs:
           # Create a bottle structure that Homebrew expects
           mkdir -p bottle-staging/skipboi/$VERSION/bin
           cp .build/release/skipboi bottle-staging/skipboi/$VERSION/bin/
-          
+
           # Create the bottle tarball
           cd bottle-staging
           tar -czf ../skipboi-$VERSION.arm64_sonoma.bottle.tar.gz .
           cd ..
-          
+
           # Calculate bottle SHA256
           shasum -a 256 skipboi-$VERSION.arm64_sonoma.bottle.tar.gz > skipboi-$VERSION.arm64_sonoma.bottle.tar.gz.sha256
-          
+
           # Also create a bottle for monterey (same binary, different name for compatibility)
           cp skipboi-$VERSION.arm64_sonoma.bottle.tar.gz skipboi-$VERSION.arm64_monterey.bottle.tar.gz
           shasum -a 256 skipboi-$VERSION.arm64_monterey.bottle.tar.gz > skipboi-$VERSION.arm64_monterey.bottle.tar.gz.sha256
-          
+
           # Create bottle for x86_64 (Intel Macs) - same binary works for both architectures
           cp skipboi-$VERSION.arm64_sonoma.bottle.tar.gz skipboi-$VERSION.x86_64_sonoma.bottle.tar.gz
           shasum -a 256 skipboi-$VERSION.x86_64_sonoma.bottle.tar.gz > skipboi-$VERSION.x86_64_sonoma.bottle.tar.gz.sha256
@@ -64,14 +64,14 @@ jobs:
         id: bottle_sha
         run: |
           VERSION=${GITHUB_REF#refs/tags/}
-          
+
           # Calculate SHA256 for each bottle file we just created
           ARM64_SONOMA_SHA=$(shasum -a 256 skipboi-${VERSION}.arm64_sonoma.bottle.tar.gz | awk '{print $1}')
           echo "ARM64_SONOMA_SHA=${ARM64_SONOMA_SHA}" >> $GITHUB_OUTPUT
-          
+
           ARM64_MONTEREY_SHA=$(shasum -a 256 skipboi-${VERSION}.arm64_monterey.bottle.tar.gz | awk '{print $1}')
           echo "ARM64_MONTEREY_SHA=${ARM64_MONTEREY_SHA}" >> $GITHUB_OUTPUT
-          
+
           X86_64_SONOMA_SHA=$(shasum -a 256 skipboi-${VERSION}.x86_64_sonoma.bottle.tar.gz | awk '{print $1}')
           echo "X86_64_SONOMA_SHA=${X86_64_SONOMA_SHA}" >> $GITHUB_OUTPUT
 
@@ -154,7 +154,7 @@ jobs:
           VERSION="${{ needs.release.outputs.version }}"
           SHA256="${{ steps.sha.outputs.SHA256 }}"
           TARBALL_URL="https://github.com/IanKnighton/skipboi/archive/refs/tags/${VERSION}.tar.gz"
-          
+
           # Bottle SHA256s from release job outputs
           ARM64_SONOMA_SHA="${{ needs.release.outputs.arm64_sonoma_sha }}"
           ARM64_MONTEREY_SHA="${{ needs.release.outputs.arm64_monterey_sha }}"
@@ -162,7 +162,7 @@ jobs:
 
           cd homebrew-tap
           mkdir -p Formula
-          
+
           if [ ! -f Formula/skipboi.rb ]; then
             # Create initial formula if it doesn't exist
             cat > Formula/skipboi.rb << EOF
