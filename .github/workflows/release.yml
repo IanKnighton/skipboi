@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
 
 permissions:
   contents: write
@@ -23,7 +23,11 @@ jobs:
 
       - name: Build Release Binary
         run: |
-          swift build -c release
+          # Extract version from git tag and embed it in the binary
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "Building skipboi version: $VERSION"
+          # Set SKIPBOI_VERSION environment variable for version embedding
+          SKIPBOI_VERSION="$VERSION" swift build -c release
           cd .build/release
           tar -czf skipboi-macos.tar.gz skipboi
           shasum -a 256 skipboi-macos.tar.gz > skipboi-macos.tar.gz.sha256
@@ -102,7 +106,7 @@ jobs:
 
           cd homebrew-tap
           mkdir -p Formula
-          
+
           if [ ! -f Formula/skipboi.rb ]; then
             # Create initial formula if it doesn't exist
             cat > Formula/skipboi.rb << EOF
@@ -117,6 +121,9 @@ jobs:
             depends_on :macos
 
             def install
+              # Set version for embedding in binary during build
+              version_string = version.to_s
+              ENV["SKIPBOI_VERSION"] = version_string
               system "swift", "build", "-c", "release", "--disable-sandbox"
               bin.install ".build/release/skipboi"
             end

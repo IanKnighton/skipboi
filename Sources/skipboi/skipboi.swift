@@ -6,6 +6,41 @@ import Foundation
 #if os(macOS)
 import AppKit
 
+// Version information
+private func getAppVersion() -> String {
+    // Try to get version from environment variable first (for build-time injection)
+    if let envVersion = ProcessInfo.processInfo.environment["SKIPBOI_VERSION"] {
+        return envVersion
+    }
+    
+    // Try to get version from git if in development
+    let task = Process()
+    task.launchPath = "/usr/bin/git"
+    task.arguments = ["describe", "--tags", "--abbrev=0"]
+    
+    let pipe = Pipe()
+    task.standardOutput = pipe
+    task.standardError = Pipe()
+    
+    do {
+        try task.run()
+        task.waitUntilExit()
+        
+        if task.terminationStatus == 0 {
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            if let version = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) {
+                return version
+            }
+        }
+    } catch {
+        // Git command failed, fall back to unknown
+    }
+    
+    return "unknown"
+}
+
+private let appVersion = getAppVersion()
+
 /// Apple Music controller using AppleScript
 class MusicController {
     enum Command: String {
@@ -177,6 +212,9 @@ struct Skipboi {
         case "help", "-h", "--help":
             showUsage()
             exit(0)
+        case "version", "-v", "--version":
+            print("skipboi \(appVersion)")
+            exit(0)
         default:
             print("Error: Unknown command '\(command)'")
             showUsage()
@@ -205,6 +243,7 @@ struct Skipboi {
             repeat              Enable repeat all mode
             repeat-one, repeatone, repeat1       Enable repeat one mode
             repeat-off, repeatoff, norepeat      Disable repeat mode
+            version, -v, --version              Show version information
             help, -h, --help    Show this help message
         
         Examples:
@@ -214,6 +253,7 @@ struct Skipboi {
             skipboi pause       # Pause playback
             skipboi shuffle     # Enable shuffle
             skipboi repeat-one  # Enable repeat one
+            skipboi version     # Show version
         """)
     }
 }
