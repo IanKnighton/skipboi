@@ -101,8 +101,36 @@ jobs:
           TARBALL_URL="https://github.com/IanKnighton/skipboi/archive/refs/tags/${VERSION}.tar.gz"
 
           cd homebrew-tap
-          sed -i '' "s|url \".*\"|url \"${TARBALL_URL}\"|" Formula/skipboi.rb
-          sed -i '' "s|sha256 \".*\"|sha256 \"${SHA256}\"|" Formula/skipboi.rb
+          mkdir -p Formula
+          
+          if [ ! -f Formula/skipboi.rb ]; then
+            # Create initial formula if it doesn't exist
+            cat > Formula/skipboi.rb << EOF
+          class Skipboi < Formula
+            desc "A simple macOS CLI for controlling Apple Music"
+            homepage "https://github.com/IanKnighton/skipboi"
+            url "${TARBALL_URL}"
+            sha256 "${SHA256}"
+            license "MIT"
+
+            depends_on xcode: ["12.0", :build]
+            depends_on :macos
+
+            def install
+              system "swift", "build", "-c", "release", "--disable-sandbox"
+              bin.install ".build/release/skipboi"
+            end
+
+            test do
+              system "#{bin}/skipboi", "help"
+            end
+          end
+          EOF
+          else
+            # Update existing formula
+            sed -i '' "s|url \".*\"|url \"${TARBALL_URL}\"|" Formula/skipboi.rb
+            sed -i '' "s|sha256 \".*\"|sha256 \"${SHA256}\"|" Formula/skipboi.rb
+          fi
 
       - name: Commit and push changes
         run: |
