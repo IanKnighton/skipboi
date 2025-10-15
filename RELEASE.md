@@ -37,10 +37,10 @@ This document describes how to create a new release of skipboi.
 4. **Verify the release**
 
    - Check that the GitHub Release was created: https://github.com/IanKnighton/skipboi/releases
-   - Verify the Homebrew formula was updated in the main branch
+   - Verify the Homebrew formula was updated in the homebrew-tap repository
    - Test the installation:
      ```bash
-     brew tap IanKnighton/skipboi
+     brew tap IanKnighton/homebrew-tap
      brew install skipboi
      skipboi help
      ```
@@ -76,7 +76,7 @@ Examples:
 
 ### Users can't install via Homebrew
 
-- Check if the tap exists: `brew tap-info IanKnighton/skipboi`
+- Check if the tap exists: `brew tap-info IanKnighton/homebrew-tap`
 - Verify the formula syntax: `brew audit --strict Formula/skipboi.rb`
 - Test installation in a clean environment
 
@@ -94,6 +94,8 @@ git add Formula/skipboi.rb
 git commit -m "Update Homebrew formula for v1.0.0"
 git push origin main
 ```
+
+Note: This step should be done in the `IanKnighton/homebrew-tap` repository.
 
 ## Release Checklist
 

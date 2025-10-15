@@ -29,7 +29,7 @@ A simple macOS CLI that allows you to start, stop, and skip songs playing in App
 The easiest way to install skipboi is through Homebrew:
 
 ```bash
-brew tap IanKnighton/skipboi
+brew tap IanKnighton/homebrew-tap
 brew install skipboi
 ```
 
@@ -183,7 +183,7 @@ If you encounter issues installing via Homebrew:
 brew update
 
 # Verify the tap
-brew tap-info IanKnighton/skipboi
+brew tap-info IanKnighton/homebrew-tap
 
 # Try reinstalling
 brew reinstall skipboi

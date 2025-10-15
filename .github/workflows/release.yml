@@ -45,7 +45,7 @@ jobs:
 
             ### Homebrew
             ```bash
-            brew tap IanKnighton/skipboi
+            brew tap IanKnighton/homebrew-tap
             brew install skipboi
             ```
 
@@ -75,10 +75,12 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout homebrew-tap repository
         uses: actions/checkout@v4
         with:
-          ref: main
+          repository: IanKnighton/homebrew-tap
+          token: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+          path: homebrew-tap
 
       - name: Extract version
         id: version
@@ -100,11 +102,13 @@ jobs:
           SHA256="${{ steps.sha.outputs.SHA256 }}"
           TARBALL_URL="https://github.com/IanKnighton/skipboi/archive/refs/tags/${VERSION}.tar.gz"
 
+          cd homebrew-tap
           sed -i '' "s|url \".*\"|url \"${TARBALL_URL}\"|" Formula/skipboi.rb
           sed -i '' "s|sha256 \".*\"|sha256 \"${SHA256}\"|" Formula/skipboi.rb
 
       - name: Commit and push changes
         run: |
+          cd homebrew-tap
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Formula/skipboi.rb
@@ -112,6 +116,6 @@ jobs:
             echo "No changes to commit"
           else
             VERSION="${{ steps.version.outputs.VERSION }}"
-            git commit -m "Update Homebrew formula for ${VERSION}"
+            git commit -m "Update skipboi formula to ${VERSION}"
             git push origin main
           fi
