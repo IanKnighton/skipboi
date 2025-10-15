@@ -29,7 +29,7 @@ A simple macOS CLI that allows you to start, stop, and skip songs playing in App
 
 ### Using Homebrew (Recommended)
 
-The easiest way to install skipboi is through Homebrew:
+The easiest way to install skipboi is through Homebrew. Starting with version 1.2.0, pre-compiled bottles are available for faster installation:
 
 ```bash
 brew tap IanKnighton/homebrew-tap
@@ -37,31 +37,42 @@ brew install skipboi
 ```
 
 To update to the latest version:
+
 ```bash
 brew upgrade skipboi
 ```
+
+**Benefits of Homebrew installation:**
+- ⚡ **Fast installation** with pre-compiled bottles (no compilation required)
+- 🔄 **Easy updates** with `brew upgrade`
+- 🛡️ **Automatic dependency management**
+- ✅ **Version verification** built-in
 
 ### Building from Source
 
 If you prefer to build from source:
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/IanKnighton/skipboi.git
 cd skipboi
 ```
 
 2. Build the project:
+
 ```bash
 swift build -c release
 ```
 
 3. Install the binary to your PATH:
+
 ```bash
 sudo cp .build/release/skipboi /usr/local/bin/
 ```
 
 Alternatively, you can add the build directory to your PATH or create a symbolic link:
+
 ```bash
 ln -s $(pwd)/.build/release/skipboi /usr/local/bin/skipboi
 ```
@@ -74,20 +85,21 @@ skipboi <command>
 
 ### Available Commands
 
-| Command | Aliases | Description |
-|---------|---------|-------------|
-| `play` | - | Start playing the current track |
-| `pause` | - | Pause the current track |
-| `playpause` | `toggle` | Toggle between play and pause |
-| `next` | `skip`, `forward` | Skip to the next track |
-| `previous` | `prev`, `back`, `backward` | Go to the previous track |
-| `current` | `now`, `nowplaying`, `info` | Show current track information |
-| `shuffle` | - | Enable shuffle mode |
-| `shuffle-off` | `shuffleoff`, `noshuffle` | Disable shuffle mode |
-| `repeat` | - | Enable repeat all mode |
-| `repeat-one` | `repeatone`, `repeat1` | Enable repeat one mode |
-| `repeat-off` | `repeatoff`, `norepeat` | Disable repeat mode |
-| `help` | `-h`, `--help` | Show help message |
+| Command       | Aliases                     | Description                     |
+| ------------- | --------------------------- | ------------------------------- |
+| `play`        | -                           | Start playing the current track |
+| `pause`       | -                           | Pause the current track         |
+| `playpause`   | `toggle`                    | Toggle between play and pause   |
+| `next`        | `skip`, `forward`           | Skip to the next track          |
+| `previous`    | `prev`, `back`, `backward`  | Go to the previous track        |
+| `current`     | `now`, `nowplaying`, `info` | Show current track information  |
+| `shuffle`     | -                           | Enable shuffle mode             |
+| `shuffle-off` | `shuffleoff`, `noshuffle`   | Disable shuffle mode            |
+| `repeat`      | -                           | Enable repeat all mode          |
+| `repeat-one`  | `repeatone`, `repeat1`      | Enable repeat one mode          |
+| `repeat-off`  | `repeatoff`, `norepeat`     | Disable repeat mode             |
+| `version`     | `-v`, `--version`           | Show version information        |
+| `help`        | `-h`, `--help`              | Show help message               |
 
 ### Examples
 
@@ -125,6 +137,9 @@ skipboi repeat-one
 # Disable repeat
 skipboi repeat-off
 
+# Show version
+skipboi version
+
 # Show help
 skipboi help
 ```
@@ -157,11 +172,64 @@ $ skipboi next
 `skipboi` uses AppleScript through Swift's `NSAppleScript` API to communicate with the Apple Music app. This provides native, reliable control without requiring any additional dependencies or frameworks.
 
 The application sends simple AppleScript commands like:
+
 ```applescript
 tell application "Music"
     play
 end tell
 ```
+
+## Version Information
+
+`skipboi` includes intelligent version detection that works across different installation methods:
+
+### Checking Your Version
+
+```bash
+# All of these commands show the version
+skipboi version
+skipboi -v
+skipboi --version
+```
+
+Example output:
+
+```bash
+$ skipboi version
+skipboi v1.1.1
+```
+
+### Version Embedding Process
+
+The version is automatically embedded during the build process:
+
+1. **Release builds** (GitHub Actions): Version is extracted from git tags and embedded during compilation
+2. **Homebrew installations**: Version is set from the formula during `brew install`
+3. **Local builds**: Version can be set using the `SKIPBOI_VERSION` environment variable
+4. **Development builds**: Falls back to "unknown" when no version is provided
+
+### Building with Version Information
+
+To build a release binary with proper version information:
+
+```bash
+# Using the included build script (recommended)
+./build-release.sh
+
+# Manual build with current git tag
+SKIPBOI_VERSION=$(git describe --tags --abbrev=0) swift build -c release
+
+# Manual build with custom version
+SKIPBOI_VERSION=v1.2.0 swift build -c release
+```
+
+The `build-release.sh` script automatically:
+
+- Extracts the current git tag
+- Sets the `SKIPBOI_VERSION` environment variable
+- Builds a release binary
+- Tests the version command
+- Provides installation instructions
 
 ## Development
 
@@ -214,6 +282,20 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 To create a new release, see [RELEASE.md](RELEASE.md) for the complete release process.
 
+#### Release Process & Version Handling
+
+The release process automatically handles version embedding:
+
+1. **Tag Creation**: When a new tag (e.g., `v1.2.0`) is pushed to GitHub
+2. **GitHub Actions**: The release workflow automatically:
+   - Extracts the version from the git tag
+   - Sets `SKIPBOI_VERSION` environment variable during build
+   - Creates release binaries with embedded version information
+   - Updates the Homebrew formula with version-aware build instructions
+3. **Distribution**: All distribution methods (GitHub releases, Homebrew) will contain the correct version
+
+This ensures that users installing via any method will see the correct version when running `skipboi version`.
+
 ## License
 
 MIT License - see [LICENSE](LICENSE) file for details.
@@ -243,6 +325,24 @@ brew reinstall skipboi
 
 Make sure Apple Music is installed and you've granted the necessary permissions. macOS may prompt you to allow Terminal (or your terminal emulator) to control Music.
 
+### Version shows "unknown"
+
+If `skipboi version` shows "unknown", this can happen in development builds. To fix:
+
+```bash
+# For development, use the build script
+./build-release.sh
+
+# Or set the version manually
+SKIPBOI_VERSION=v1.1.1 swift build -c release
+```
+
+If you installed via Homebrew and still see "unknown", try reinstalling:
+
+```bash
+brew reinstall skipboi
+```
+
 ### Permission denied when installing
 
 If you get a permission error when copying to `/usr/local/bin/`, make sure you're using `sudo` or have write permissions to that directory.
@@ -250,11 +350,13 @@ If you get a permission error when copying to `/usr/local/bin/`, make sure you'r
 ### Command not found
 
 Make sure `/usr/local/bin` is in your PATH, or use the full path to the binary:
+
 ```bash
 echo $PATH
 ```
 
 If `/usr/local/bin` is not in your PATH, add it to your shell configuration file (`~/.zshrc`, `~/.bashrc`, etc.):
+
 ```bash
 export PATH="/usr/local/bin:$PATH"
 ```

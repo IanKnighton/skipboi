@@ -40,14 +40,24 @@ Updated the installation section to:
 ### User Installation Flow
 1. User runs `brew tap IanKnighton/homebrew-tap` to add the tap
 2. User runs `brew install skipboi` to install
-3. Homebrew downloads the source tarball from GitHub
-4. Homebrew builds skipboi from source on the user's machine
+3. **NEW**: Homebrew downloads pre-compiled bottle (binary) from GitHub releases (fast)
+4. **FALLBACK**: If bottle unavailable, Homebrew downloads source and builds locally
 5. Binary is installed to Homebrew's bin directory (typically `/opt/homebrew/bin` or `/usr/local/bin`)
 
 ### Release Flow
 1. Maintainer creates and pushes a version tag (e.g., `v1.0.0`)
 2. GitHub Actions workflow triggers automatically
-3. Workflow builds the release binary
+3. Workflow builds the release binary with embedded version information
+4. **NEW**: Workflow creates Homebrew bottles (pre-compiled binaries) for multiple macOS versions:
+   - `arm64_sonoma` (Apple Silicon on macOS Sonoma)
+   - `arm64_monterey` (Apple Silicon on macOS Monterey)  
+   - `x86_64_sonoma` (Intel on macOS Sonoma)
+5. **NEW**: Workflow calculates SHA256 hashes for all bottle files
+6. Workflow creates a GitHub Release with binaries, bottles, and checksums
+7. Second job downloads the source tarball and calculates SHA256
+8. **UPDATED**: Workflow updates the formula in `IanKnighton/homebrew-tap` repository with bottle information
+9. Changes are committed and pushed to the homebrew-tap repository
+10. Users can now install/upgrade to the new version via Homebrew (using bottles for fast installation)
 4. Workflow creates a GitHub Release with binaries and checksums
 5. Second job downloads the source tarball and calculates SHA256
 6. Workflow updates the formula in `IanKnighton/homebrew-tap` repository
@@ -83,6 +93,12 @@ Before creating the first official release (v1.0.0), you should:
 - Will be pushed to existing `IanKnighton/homebrew-tap` repository
 - Uses HOMEBREW_TAP_GITHUB_TOKEN secret for authentication
 
+✅ **Bottles (pre-compiled binaries) added** ⭐ **NEW**
+- GitHub Actions workflow creates bottles for multiple macOS versions
+- Bottles uploaded as release artifacts with SHA256 verification
+- Formula includes bottle block for fast installation without compilation
+- Supports both Apple Silicon and Intel Macs
+
 ✅ **Documentation is updated**
 - README.md updated with Homebrew installation as primary method
 - RELEASE.md added with comprehensive release process
@@ -93,31 +109,57 @@ Before creating the first official release (v1.0.0), you should:
 - GitHub Actions workflow automatically handles releases
 - Formula in homebrew-tap repo is automatically updated with correct version and SHA256
 - Uses HOMEBREW_TAP_GITHUB_TOKEN secret to push to external repository
-- Binary artifacts are attached to GitHub Releases
+- Binary artifacts and bottles are attached to GitHub Releases
 - Release notes include installation instructions
 
 ## Future Enhancements (Optional)
 
-1. **Add version flag to skipboi**
-   ```swift
-   case "version", "-v", "--version":
-       print("skipboi v1.0.0")
-   ```
+1. **Add bottles for more macOS versions** 
+   - Currently supports Sonoma and Monterey
+   - Could add support for Ventura, Big Sur if needed
 
-2. **Add bottles (pre-compiled binaries)** for faster installation
-   - Currently, Homebrew builds from source on each installation
-   - Bottles would provide pre-compiled binaries for different macOS versions
-
-3. **Submit to homebrew-core**
+2. **Submit to homebrew-core**
    - Currently a custom tap (IanKnighton/homebrew-tap)
    - Could submit to official homebrew-core for wider distribution
    - Requires meeting homebrew-core's strict guidelines
+
+3. **Cross-platform support**
+   - Currently macOS-only due to AppleScript dependency
+   - Could explore AppleScript alternatives for other platforms
+
+## Bottle Technical Details
+
+### Bottle Structure
+Bottles follow Homebrew's expected directory structure:
+```
+skipboi/
+└── {version}/
+    └── bin/
+        └── skipboi
+```
+
+### Bottle Naming Convention
+- `skipboi-{version}.arm64_sonoma.bottle.tar.gz` - Apple Silicon macOS Sonoma
+- `skipboi-{version}.arm64_monterey.bottle.tar.gz` - Apple Silicon macOS Monterey  
+- `skipboi-{version}.x86_64_sonoma.bottle.tar.gz` - Intel macOS Sonoma
+
+### SHA256 Verification
+Each bottle includes SHA256 hash in the formula for security:
+```ruby
+bottle do
+  sha256 cellar: :any_skip_relocation, arm64_sonoma:   "abc123..."
+  sha256 cellar: :any_skip_relocation, arm64_monterey: "def456..."
+  sha256 cellar: :any_skip_relocation, x86_64_sonoma:  "ghi789..."
+end
+```
 
 ## Notes
 
 - The formula is maintained in the separate `IanKnighton/homebrew-tap` repository
 - The workflow uses the HOMEBREW_TAP_GITHUB_TOKEN secret to push to the external repository
-- The formula builds from source on each user's machine (no bottles yet)
-- Requires Xcode 14.0+ to build
+- **NEW**: The formula includes bottles for fast installation without compilation
+- **NEW**: Fallback to source build if bottles are unavailable or incompatible
+- Requires Xcode 14.0+ to build (only needed if building from source)
 - Only works on macOS Catalina (10.15) or later
 - First release should be tagged as `v1.0.0` to initialize the formula
+- **NEW**: Version information is embedded in both bottles and source builds
