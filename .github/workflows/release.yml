@@ -183,9 +183,8 @@ jobs:
           cd homebrew-tap
           mkdir -p Formula
 
-          if [ ! -f Formula/skipboi.rb ]; then
-            # Create initial formula if it doesn't exist
-            cat > Formula/skipboi.rb << EOF
+          # Always create/recreate the formula file to ensure bottles are included
+          cat > Formula/skipboi.rb << EOF
           class Skipboi < Formula
             desc "A simple macOS CLI for controlling Apple Music"
             homepage "https://github.com/IanKnighton/skipboi"
@@ -217,21 +216,6 @@ jobs:
             end
           end
           EOF
-          else
-            # Update existing formula
-            sed -i '' "s|url \".*\"|url \"${TARBALL_URL}\"|" Formula/skipboi.rb
-            sed -i '' "s|sha256 \".*\"|sha256 \"${SHA256}\"|" Formula/skipboi.rb
-            
-            # Update bottle block
-            sed -i '' "/bottle do/,/end/c\\
-          bottle do\\
-            sha256 cellar: :any_skip_relocation, arm64_sequoia:  \"${ARM64_SEQUOIA_SHA}\"\\
-            sha256 cellar: :any_skip_relocation, arm64_tahoe:    \"${ARM64_TAHOE_SHA}\"\\
-            sha256 cellar: :any_skip_relocation, arm64_sonoma:   \"${ARM64_SONOMA_SHA}\"\\
-            sha256 cellar: :any_skip_relocation, arm64_monterey: \"${ARM64_MONTEREY_SHA}\"\\
-            sha256 cellar: :any_skip_relocation, x86_64_sonoma:  \"${X86_64_SONOMA_SHA}\"\\
-          end" Formula/skipboi.rb
-          fi
 
       - name: Commit and push changes
         run: |
