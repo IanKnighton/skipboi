@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:skipboi}",
+            "name": "Debug skipboi",
+            "program": "${workspaceFolder:skipboi}/.build/debug/skipboi",
+            "preLaunchTask": "swift: Build Debug skipboi"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:skipboi}",
+            "name": "Release skipboi",
+            "program": "${workspaceFolder:skipboi}/.build/release/skipboi",
+            "preLaunchTask": "swift: Build Release skipboi"
+        }
+    ]
+}
