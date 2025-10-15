@@ -193,6 +193,7 @@ jobs:
             license "MIT"
 
             bottle do
+              root_url "https://github.com/IanKnighton/skipboi/releases/download/${VERSION}"
               sha256 cellar: :any_skip_relocation, arm64_sequoia:  "${ARM64_SEQUOIA_SHA}"
               sha256 cellar: :any_skip_relocation, arm64_tahoe:    "${ARM64_TAHOE_SHA}"
               sha256 cellar: :any_skip_relocation, arm64_sonoma:   "${ARM64_SONOMA_SHA}"
