@@ -85,7 +85,12 @@ class MusicController {
     }
     
     /// Display current track information
-    func displayTrackInfo() {
+    /// - Parameter delay: Optional delay in seconds before fetching track info (useful after track changes)
+    func displayTrackInfo(delay: TimeInterval = 0) {
+        if delay > 0 {
+            Thread.sleep(forTimeInterval: delay)
+        }
+        
         guard let info = getCurrentTrackInfo() else {
             print("❌ No track currently playing")
             return
@@ -133,13 +138,13 @@ struct Skipboi {
             success = controller.execute(.nextTrack)
             if success {
                 print("⏭️  Next track")
-                controller.displayTrackInfo()
+                controller.displayTrackInfo(delay: 0.5)
             }
         case "previous", "prev", "back", "backward":
             success = controller.execute(.previousTrack)
             if success {
                 print("⏮️  Previous track")
-                controller.displayTrackInfo()
+                controller.displayTrackInfo(delay: 0.5)
             }
         case "current", "now", "nowplaying", "info":
             controller.displayTrackInfo()

@@ -141,7 +141,7 @@ $ skipboi current
    Album:  Album Name
 ```
 
-Additionally, track information is automatically displayed when using the `next` or `previous` commands:
+Additionally, track information is automatically displayed when using the `next` or `previous` commands. A brief delay (0.5 seconds) is applied after changing tracks to ensure Apple Music has updated its state, providing accurate track information:
 
 ```bash
 $ skipboi next
