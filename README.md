@@ -160,6 +160,10 @@ To add a new command:
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+### For Maintainers
+
+To create a new release, see [RELEASE.md](RELEASE.md) for the complete release process.
+
 ## License
 
 MIT License - see [LICENSE](LICENSE) file for details.

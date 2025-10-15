@@ -11,29 +11,29 @@ permissions:
 jobs:
   release:
     runs-on: macos-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Setup Swift
         uses: swift-actions/setup-swift@v2
         with:
           swift-version: "6.2"
-      
+
       - name: Build Release Binary
         run: |
           swift build -c release
           cd .build/release
           tar -czf skipboi-macos.tar.gz skipboi
           shasum -a 256 skipboi-macos.tar.gz > skipboi-macos.tar.gz.sha256
-      
+
       - name: Extract version
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-      
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
@@ -42,62 +42,67 @@ jobs:
             .build/release/skipboi-macos.tar.gz.sha256
           body: |
             ## Installation
-            
+
             ### Homebrew
             ```bash
             brew tap IanKnighton/skipboi
             brew install skipboi
             ```
-            
+
             Or update if already installed:
             ```bash
             brew upgrade skipboi
             ```
-            
+
             ### Manual Installation
             ```bash
-            curl -L https://github.com/IanKnighton/skipboi/releases/download/${{ steps.version.outputs.VERSION }}/skipboi-macos.tar.gz | tar xz
+            VERSION=${{ steps.version.outputs.VERSION }}
+            DOWNLOAD_URL="https://github.com/IanKnighton/skipboi"
+            DOWNLOAD_URL="${DOWNLOAD_URL}/releases/download/${VERSION}/skipboi-macos.tar.gz"
+            curl -L "${DOWNLOAD_URL}" | tar xz
             sudo mv skipboi /usr/local/bin/
             ```
-            
+
             ## What's Changed
             See the commit history for details.
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
+
   update-formula:
     needs: release
     runs-on: macos-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           ref: main
-      
+
       - name: Extract version
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-      
+
       - name: Download and calculate SHA256
         id: sha
         run: |
           VERSION="${{ steps.version.outputs.VERSION }}"
-          curl -sL "https://github.com/IanKnighton/skipboi/archive/refs/tags/${VERSION}.tar.gz" -o source.tar.gz
+          TARBALL_URL="https://github.com/IanKnighton/skipboi/archive/refs/tags/${VERSION}.tar.gz"
+          curl -sL "${TARBALL_URL}" -o source.tar.gz
           SHA256=$(shasum -a 256 source.tar.gz | awk '{print $1}')
           echo "SHA256=${SHA256}" >> $GITHUB_OUTPUT
           rm source.tar.gz
-      
+
       - name: Update Homebrew Formula
         run: |
           VERSION="${{ steps.version.outputs.VERSION }}"
           SHA256="${{ steps.sha.outputs.SHA256 }}"
-          
-          sed -i '' "s|url \".*\"|url \"https://github.com/IanKnighton/skipboi/archive/refs/tags/${VERSION}.tar.gz\"|" Formula/skipboi.rb
+          TARBALL_URL="https://github.com/IanKnighton/skipboi/archive/refs/tags/${VERSION}.tar.gz"
+
+          sed -i '' "s|url \".*\"|url \"${TARBALL_URL}\"|" Formula/skipboi.rb
           sed -i '' "s|sha256 \".*\"|sha256 \"${SHA256}\"|" Formula/skipboi.rb
-      
+
       - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
@@ -106,7 +111,7 @@ jobs:
           if git diff-index --quiet HEAD; then
             echo "No changes to commit"
           else
-            git commit -m "Update Homebrew formula for ${{ steps.version.outputs.VERSION }}"
+            VERSION="${{ steps.version.outputs.VERSION }}"
+            git commit -m "Update Homebrew formula for ${VERSION}"
             git push origin main
           fi
-
