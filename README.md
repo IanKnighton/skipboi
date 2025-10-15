@@ -12,6 +12,7 @@ A simple macOS CLI that allows you to start, stop, and skip songs playing in App
 - ⏭️ Skip to next track
 - ⏮️ Go to previous track
 - ⏯️ Toggle playback
+- 🎵 Display current track information (title, artist, album)
 - 🔀 Shuffle control (enable/disable)
 - 🔁 Repeat control (off/all/one)
 - 🎯 Native Swift implementation using AppleScript
@@ -80,6 +81,7 @@ skipboi <command>
 | `playpause` | `toggle` | Toggle between play and pause |
 | `next` | `skip`, `forward` | Skip to the next track |
 | `previous` | `prev`, `back`, `backward` | Go to the previous track |
+| `current` | `now`, `nowplaying`, `info` | Show current track information |
 | `shuffle` | - | Enable shuffle mode |
 | `shuffle-off` | `shuffleoff`, `noshuffle` | Disable shuffle mode |
 | `repeat` | - | Enable repeat all mode |
@@ -102,6 +104,9 @@ skipboi next
 # Go to the previous track
 skipboi previous
 
+# Show current track information
+skipboi current
+
 # Toggle play/pause
 skipboi toggle
 
@@ -122,6 +127,29 @@ skipboi repeat-off
 
 # Show help
 skipboi help
+```
+
+### Track Information
+
+The `current` command (and its aliases `now`, `nowplaying`, `info`) displays the currently playing track's information:
+
+```bash
+$ skipboi current
+🎵 Now Playing:
+   Title:  Song Title
+   Artist: Artist Name
+   Album:  Album Name
+```
+
+Additionally, track information is automatically displayed when using the `next` or `previous` commands:
+
+```bash
+$ skipboi next
+⏭️  Next track
+🎵 Now Playing:
+   Title:  Next Song Title
+   Artist: Next Artist Name
+   Album:  Next Album Name
 ```
 
 ## How It Works

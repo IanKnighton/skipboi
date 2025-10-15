@@ -44,6 +44,58 @@ class MusicController {
         
         return true
     }
+    
+    /// Get current track information from Apple Music
+    func getCurrentTrackInfo() -> (title: String, artist: String, album: String)? {
+        let script = """
+        tell application "Music"
+            if player state is not stopped then
+                set trackTitle to name of current track
+                set trackArtist to artist of current track
+                set trackAlbum to album of current track
+                return trackTitle & "|" & trackArtist & "|" & trackAlbum
+            else
+                return ""
+            end if
+        end tell
+        """
+        
+        guard let appleScript = NSAppleScript(source: script) else {
+            return nil
+        }
+        
+        var error: NSDictionary?
+        let result = appleScript.executeAndReturnError(&error)
+        
+        if let error = error {
+            print("Error getting track info: \(error)")
+            return nil
+        }
+        
+        guard let output = result.stringValue, !output.isEmpty else {
+            return nil
+        }
+        
+        let components = output.components(separatedBy: "|")
+        guard components.count == 3 else {
+            return nil
+        }
+        
+        return (title: components[0], artist: components[1], album: components[2])
+    }
+    
+    /// Display current track information
+    func displayTrackInfo() {
+        guard let info = getCurrentTrackInfo() else {
+            print("❌ No track currently playing")
+            return
+        }
+        
+        print("🎵 Now Playing:")
+        print("   Title:  \(info.title)")
+        print("   Artist: \(info.artist)")
+        print("   Album:  \(info.album)")
+    }
 }
 
 @main
@@ -81,12 +133,17 @@ struct Skipboi {
             success = controller.execute(.nextTrack)
             if success {
                 print("⏭️  Next track")
+                controller.displayTrackInfo()
             }
         case "previous", "prev", "back", "backward":
             success = controller.execute(.previousTrack)
             if success {
                 print("⏮️  Previous track")
+                controller.displayTrackInfo()
             }
+        case "current", "now", "nowplaying", "info":
+            controller.displayTrackInfo()
+            success = true
         case "shuffle":
             success = controller.execute(.shuffleOn)
             if success {
@@ -137,6 +194,7 @@ struct Skipboi {
             playpause, toggle   Toggle between play and pause
             next, skip, forward Skip to the next track
             previous, prev, back, backward   Go to the previous track
+            current, now, nowplaying, info   Show current track information
             shuffle             Enable shuffle mode
             shuffle-off, shuffleoff, noshuffle   Disable shuffle mode
             repeat              Enable repeat all mode
@@ -147,6 +205,7 @@ struct Skipboi {
         Examples:
             skipboi play        # Start playing
             skipboi next        # Skip to next track
+            skipboi current     # Show current track info
             skipboi pause       # Pause playback
             skipboi shuffle     # Enable shuffle
             skipboi repeat-one  # Enable repeat one
