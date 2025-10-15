@@ -12,6 +12,8 @@ A simple macOS CLI that allows you to start, stop, and skip songs playing in App
 - ⏭️ Skip to next track
 - ⏮️ Go to previous track
 - ⏯️ Toggle playback
+- 🔀 Shuffle control (enable/disable)
+- 🔁 Repeat control (off/all/one)
 - 🎯 Native Swift implementation using AppleScript
 - 🚀 Fast and lightweight
 - 💻 Perfect for staying in your terminal workflow
@@ -78,6 +80,11 @@ skipboi <command>
 | `playpause` | `toggle` | Toggle between play and pause |
 | `next` | `skip`, `forward` | Skip to the next track |
 | `previous` | `prev`, `back`, `backward` | Go to the previous track |
+| `shuffle` | - | Enable shuffle mode |
+| `shuffle-off` | `shuffleoff`, `noshuffle` | Disable shuffle mode |
+| `repeat` | - | Enable repeat all mode |
+| `repeat-one` | `repeatone`, `repeat1` | Enable repeat one mode |
+| `repeat-off` | `repeatoff`, `norepeat` | Disable repeat mode |
 | `help` | `-h`, `--help` | Show help message |
 
 ### Examples
@@ -97,6 +104,21 @@ skipboi previous
 
 # Toggle play/pause
 skipboi toggle
+
+# Enable shuffle
+skipboi shuffle
+
+# Disable shuffle
+skipboi shuffle-off
+
+# Enable repeat all
+skipboi repeat
+
+# Enable repeat one
+skipboi repeat-one
+
+# Disable repeat
+skipboi repeat-off
 
 # Show help
 skipboi help
