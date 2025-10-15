@@ -62,6 +62,7 @@ sudo cp .build/release/skipboi /usr/local/bin/
 4. **Test**: Use `swift run skipboi <command>` before building release
 
 ## Critical Dependencies
+- **Swift 6.1+**: Required for compilation (Package.swift specifies swift-tools-version: 6.1)
 - **macOS 10.15+**: Required for `NSAppleScript` API
 - **Apple Music app**: Must be installed (not Apple Music web)
 - **AppKit framework**: Only available on macOS (hence platform checks)
