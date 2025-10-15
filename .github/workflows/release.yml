@@ -15,6 +15,8 @@ jobs:
       version: ${{ steps.version.outputs.VERSION }}
       arm64_sonoma_sha: ${{ steps.bottle_sha.outputs.ARM64_SONOMA_SHA }}
       arm64_monterey_sha: ${{ steps.bottle_sha.outputs.ARM64_MONTEREY_SHA }}
+      arm64_tahoe_sha: ${{ steps.bottle_sha.outputs.ARM64_TAHOE_SHA }}
+      arm64_sequoia_sha: ${{ steps.bottle_sha.outputs.ARM64_SEQUOIA_SHA }}
       x86_64_sonoma_sha: ${{ steps.bottle_sha.outputs.X86_64_SONOMA_SHA }}
 
     steps:
@@ -52,9 +54,15 @@ jobs:
           # Calculate bottle SHA256
           shasum -a 256 skipboi-$VERSION.arm64_sonoma.bottle.tar.gz > skipboi-$VERSION.arm64_sonoma.bottle.tar.gz.sha256
 
-          # Also create a bottle for monterey (same binary, different name for compatibility)
+          # Also create bottles for other macOS versions (same binary, different name for compatibility)
           cp skipboi-$VERSION.arm64_sonoma.bottle.tar.gz skipboi-$VERSION.arm64_monterey.bottle.tar.gz
           shasum -a 256 skipboi-$VERSION.arm64_monterey.bottle.tar.gz > skipboi-$VERSION.arm64_monterey.bottle.tar.gz.sha256
+
+          cp skipboi-$VERSION.arm64_sonoma.bottle.tar.gz skipboi-$VERSION.arm64_tahoe.bottle.tar.gz
+          shasum -a 256 skipboi-$VERSION.arm64_tahoe.bottle.tar.gz > skipboi-$VERSION.arm64_tahoe.bottle.tar.gz.sha256
+
+          cp skipboi-$VERSION.arm64_sonoma.bottle.tar.gz skipboi-$VERSION.arm64_sequoia.bottle.tar.gz
+          shasum -a 256 skipboi-$VERSION.arm64_sequoia.bottle.tar.gz > skipboi-$VERSION.arm64_sequoia.bottle.tar.gz.sha256
 
           # Create bottle for x86_64 (Intel Macs) - same binary works for both architectures
           cp skipboi-$VERSION.arm64_sonoma.bottle.tar.gz skipboi-$VERSION.x86_64_sonoma.bottle.tar.gz
@@ -71,6 +79,12 @@ jobs:
 
           ARM64_MONTEREY_SHA=$(shasum -a 256 skipboi-${VERSION}.arm64_monterey.bottle.tar.gz | awk '{print $1}')
           echo "ARM64_MONTEREY_SHA=${ARM64_MONTEREY_SHA}" >> $GITHUB_OUTPUT
+
+          ARM64_TAHOE_SHA=$(shasum -a 256 skipboi-${VERSION}.arm64_tahoe.bottle.tar.gz | awk '{print $1}')
+          echo "ARM64_TAHOE_SHA=${ARM64_TAHOE_SHA}" >> $GITHUB_OUTPUT
+
+          ARM64_SEQUOIA_SHA=$(shasum -a 256 skipboi-${VERSION}.arm64_sequoia.bottle.tar.gz | awk '{print $1}')
+          echo "ARM64_SEQUOIA_SHA=${ARM64_SEQUOIA_SHA}" >> $GITHUB_OUTPUT
 
           X86_64_SONOMA_SHA=$(shasum -a 256 skipboi-${VERSION}.x86_64_sonoma.bottle.tar.gz | awk '{print $1}')
           echo "X86_64_SONOMA_SHA=${X86_64_SONOMA_SHA}" >> $GITHUB_OUTPUT
@@ -89,6 +103,10 @@ jobs:
             skipboi-${{ steps.version.outputs.VERSION }}.arm64_sonoma.bottle.tar.gz.sha256
             skipboi-${{ steps.version.outputs.VERSION }}.arm64_monterey.bottle.tar.gz
             skipboi-${{ steps.version.outputs.VERSION }}.arm64_monterey.bottle.tar.gz.sha256
+            skipboi-${{ steps.version.outputs.VERSION }}.arm64_tahoe.bottle.tar.gz
+            skipboi-${{ steps.version.outputs.VERSION }}.arm64_tahoe.bottle.tar.gz.sha256
+            skipboi-${{ steps.version.outputs.VERSION }}.arm64_sequoia.bottle.tar.gz
+            skipboi-${{ steps.version.outputs.VERSION }}.arm64_sequoia.bottle.tar.gz.sha256
             skipboi-${{ steps.version.outputs.VERSION }}.x86_64_sonoma.bottle.tar.gz
             skipboi-${{ steps.version.outputs.VERSION }}.x86_64_sonoma.bottle.tar.gz.sha256
           body: |
@@ -158,6 +176,8 @@ jobs:
           # Bottle SHA256s from release job outputs
           ARM64_SONOMA_SHA="${{ needs.release.outputs.arm64_sonoma_sha }}"
           ARM64_MONTEREY_SHA="${{ needs.release.outputs.arm64_monterey_sha }}"
+          ARM64_TAHOE_SHA="${{ needs.release.outputs.arm64_tahoe_sha }}"
+          ARM64_SEQUOIA_SHA="${{ needs.release.outputs.arm64_sequoia_sha }}"
           X86_64_SONOMA_SHA="${{ needs.release.outputs.x86_64_sonoma_sha }}"
 
           cd homebrew-tap
@@ -174,6 +194,8 @@ jobs:
             license "MIT"
 
             bottle do
+              sha256 cellar: :any_skip_relocation, arm64_sequoia:  "${ARM64_SEQUOIA_SHA}"
+              sha256 cellar: :any_skip_relocation, arm64_tahoe:    "${ARM64_TAHOE_SHA}"
               sha256 cellar: :any_skip_relocation, arm64_sonoma:   "${ARM64_SONOMA_SHA}"
               sha256 cellar: :any_skip_relocation, arm64_monterey: "${ARM64_MONTEREY_SHA}"
               sha256 cellar: :any_skip_relocation, x86_64_sonoma:  "${X86_64_SONOMA_SHA}"
@@ -203,6 +225,8 @@ jobs:
             # Update bottle block
             sed -i '' "/bottle do/,/end/c\\
           bottle do\\
+            sha256 cellar: :any_skip_relocation, arm64_sequoia:  \"${ARM64_SEQUOIA_SHA}\"\\
+            sha256 cellar: :any_skip_relocation, arm64_tahoe:    \"${ARM64_TAHOE_SHA}\"\\
             sha256 cellar: :any_skip_relocation, arm64_sonoma:   \"${ARM64_SONOMA_SHA}\"\\
             sha256 cellar: :any_skip_relocation, arm64_monterey: \"${ARM64_MONTEREY_SHA}\"\\
             sha256 cellar: :any_skip_relocation, x86_64_sonoma:  \"${X86_64_SONOMA_SHA}\"\\
