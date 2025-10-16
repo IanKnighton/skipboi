@@ -15,6 +15,7 @@ A simple macOS CLI that allows you to start, stop, and skip songs playing in App
 - 🎵 Display current track information (title, artist, album)
 - 🔀 Shuffle control (enable/disable)
 - 🔁 Repeat control (off/all/one)
+- 🔊 Volume control (up/down/mute/unmute)
 - 🎯 Native Swift implementation using AppleScript
 - 🚀 Fast and lightweight
 - 💻 Perfect for staying in your terminal workflow
@@ -98,6 +99,10 @@ skipboi <command>
 | `repeat`      | -                           | Enable repeat all mode          |
 | `repeat-one`  | `repeatone`, `repeat1`      | Enable repeat one mode          |
 | `repeat-off`  | `repeatoff`, `norepeat`     | Disable repeat mode             |
+| `volume-up`   | `volumeup`, `volup`, `louder` | Increase system volume        |
+| `volume-down` | `volumedown`, `voldown`, `quieter` | Decrease system volume   |
+| `mute`        | -                           | Mute system audio               |
+| `unmute`      | -                           | Unmute system audio             |
 | `version`     | `-v`, `--version`           | Show version information        |
 | `help`        | `-h`, `--help`              | Show help message               |
 
@@ -136,6 +141,18 @@ skipboi repeat-one
 
 # Disable repeat
 skipboi repeat-off
+
+# Increase volume
+skipboi volume-up
+
+# Decrease volume
+skipboi volume-down
+
+# Mute audio
+skipboi mute
+
+# Unmute audio
+skipboi unmute
 
 # Show version
 skipboi version
