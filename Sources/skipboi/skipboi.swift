@@ -54,15 +54,46 @@ class MusicController {
         case repeatOff = "set song repeat to off"
         case repeatOne = "set song repeat to one"
         case repeatAll = "set song repeat to all"
+        case volumeUp
+        case volumeDown
+        case mute
+        case unmute
     }
     
-    /// Execute an AppleScript command for Apple Music
+    /// Execute an AppleScript command for Apple Music or system volume
     func execute(_ command: Command) -> Bool {
-        let script = """
-        tell application "Music"
-            \(command.rawValue)
-        end tell
-        """
+        let script: String
+        
+        switch command {
+        case .volumeUp:
+            script = """
+            set currentVolume to output volume of (get volume settings)
+            set newVolume to currentVolume + 10
+            if newVolume > 100 then
+                set newVolume to 100
+            end if
+            set volume output volume newVolume
+            """
+        case .volumeDown:
+            script = """
+            set currentVolume to output volume of (get volume settings)
+            set newVolume to currentVolume - 10
+            if newVolume < 0 then
+                set newVolume to 0
+            end if
+            set volume output volume newVolume
+            """
+        case .mute:
+            script = "set volume output muted true"
+        case .unmute:
+            script = "set volume output muted false"
+        default:
+            script = """
+            tell application "Music"
+                \(command.rawValue)
+            end tell
+            """
+        }
         
         guard let appleScript = NSAppleScript(source: script) else {
             print("Error: Failed to create AppleScript")
@@ -209,6 +240,26 @@ struct Skipboi {
             if success {
                 print("➡️  Repeat disabled")
             }
+        case "volume-up", "volumeup", "volup", "louder":
+            success = controller.execute(.volumeUp)
+            if success {
+                print("🔊 Volume increased")
+            }
+        case "volume-down", "volumedown", "voldown", "quieter":
+            success = controller.execute(.volumeDown)
+            if success {
+                print("🔉 Volume decreased")
+            }
+        case "mute":
+            success = controller.execute(.mute)
+            if success {
+                print("🔇 Muted")
+            }
+        case "unmute":
+            success = controller.execute(.unmute)
+            if success {
+                print("🔊 Unmuted")
+            }
         case "help", "-h", "--help":
             showUsage()
             exit(0)
@@ -243,6 +294,10 @@ struct Skipboi {
             repeat              Enable repeat all mode
             repeat-one, repeatone, repeat1       Enable repeat one mode
             repeat-off, repeatoff, norepeat      Disable repeat mode
+            volume-up, volumeup, volup, louder   Increase system volume
+            volume-down, volumedown, voldown, quieter   Decrease system volume
+            mute                Mute system audio
+            unmute              Unmute system audio
             version, -v, --version              Show version information
             help, -h, --help    Show this help message
         
@@ -253,6 +308,8 @@ struct Skipboi {
             skipboi pause       # Pause playback
             skipboi shuffle     # Enable shuffle
             skipboi repeat-one  # Enable repeat one
+            skipboi volume-up   # Increase volume
+            skipboi mute        # Mute audio
             skipboi version     # Show version
         """)
     }
