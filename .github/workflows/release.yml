@@ -42,64 +42,56 @@ jobs:
       - name: Create Homebrew Bottle
         run: |
           VERSION=${GITHUB_REF#refs/tags/}
-          # Strip 'v' prefix from version for bottle filenames (Homebrew expects version without 'v')
-          VERSION_NO_V=${VERSION#v}
           # Create a bottle structure that Homebrew expects
           mkdir -p bottle-staging/skipboi/$VERSION/bin
           cp .build/release/skipboi bottle-staging/skipboi/$VERSION/bin/
 
-          # Create the bottle tarball (use VERSION_NO_V for filename)
+          # Create the bottle tarball
           cd bottle-staging
-          tar -czf ../skipboi-$VERSION_NO_V.arm64_sonoma.bottle.tar.gz .
+          tar -czf ../skipboi-$VERSION.arm64_sonoma.bottle.tar.gz .
           cd ..
 
           # Calculate bottle SHA256
-          shasum -a 256 skipboi-$VERSION_NO_V.arm64_sonoma.bottle.tar.gz > skipboi-$VERSION_NO_V.arm64_sonoma.bottle.tar.gz.sha256
+          shasum -a 256 skipboi-$VERSION.arm64_sonoma.bottle.tar.gz > skipboi-$VERSION.arm64_sonoma.bottle.tar.gz.sha256
 
           # Also create bottles for other macOS versions (same binary, different name for compatibility)
-          cp skipboi-$VERSION_NO_V.arm64_sonoma.bottle.tar.gz skipboi-$VERSION_NO_V.arm64_monterey.bottle.tar.gz
-          shasum -a 256 skipboi-$VERSION_NO_V.arm64_monterey.bottle.tar.gz > skipboi-$VERSION_NO_V.arm64_monterey.bottle.tar.gz.sha256
+          cp skipboi-$VERSION.arm64_sonoma.bottle.tar.gz skipboi-$VERSION.arm64_monterey.bottle.tar.gz
+          shasum -a 256 skipboi-$VERSION.arm64_monterey.bottle.tar.gz > skipboi-$VERSION.arm64_monterey.bottle.tar.gz.sha256
 
-          cp skipboi-$VERSION_NO_V.arm64_sonoma.bottle.tar.gz skipboi-$VERSION_NO_V.arm64_tahoe.bottle.tar.gz
-          shasum -a 256 skipboi-$VERSION_NO_V.arm64_tahoe.bottle.tar.gz > skipboi-$VERSION_NO_V.arm64_tahoe.bottle.tar.gz.sha256
+          cp skipboi-$VERSION.arm64_sonoma.bottle.tar.gz skipboi-$VERSION.arm64_tahoe.bottle.tar.gz
+          shasum -a 256 skipboi-$VERSION.arm64_tahoe.bottle.tar.gz > skipboi-$VERSION.arm64_tahoe.bottle.tar.gz.sha256
 
-          cp skipboi-$VERSION_NO_V.arm64_sonoma.bottle.tar.gz skipboi-$VERSION_NO_V.arm64_sequoia.bottle.tar.gz
-          shasum -a 256 skipboi-$VERSION_NO_V.arm64_sequoia.bottle.tar.gz > skipboi-$VERSION_NO_V.arm64_sequoia.bottle.tar.gz.sha256
+          cp skipboi-$VERSION.arm64_sonoma.bottle.tar.gz skipboi-$VERSION.arm64_sequoia.bottle.tar.gz
+          shasum -a 256 skipboi-$VERSION.arm64_sequoia.bottle.tar.gz > skipboi-$VERSION.arm64_sequoia.bottle.tar.gz.sha256
 
           # Create bottle for x86_64 (Intel Macs) - same binary works for both architectures
-          cp skipboi-$VERSION_NO_V.arm64_sonoma.bottle.tar.gz skipboi-$VERSION_NO_V.x86_64_sonoma.bottle.tar.gz
-          shasum -a 256 skipboi-$VERSION_NO_V.x86_64_sonoma.bottle.tar.gz > skipboi-$VERSION_NO_V.x86_64_sonoma.bottle.tar.gz.sha256
+          cp skipboi-$VERSION.arm64_sonoma.bottle.tar.gz skipboi-$VERSION.x86_64_sonoma.bottle.tar.gz
+          shasum -a 256 skipboi-$VERSION.x86_64_sonoma.bottle.tar.gz > skipboi-$VERSION.x86_64_sonoma.bottle.tar.gz.sha256
 
       - name: Calculate bottle SHA256s
         id: bottle_sha
         run: |
           VERSION=${GITHUB_REF#refs/tags/}
-          # Strip 'v' prefix from version for bottle filenames
-          VERSION_NO_V=${VERSION#v}
 
           # Calculate SHA256 for each bottle file we just created
-          ARM64_SONOMA_SHA=$(shasum -a 256 skipboi-${VERSION_NO_V}.arm64_sonoma.bottle.tar.gz | awk '{print $1}')
+          ARM64_SONOMA_SHA=$(shasum -a 256 skipboi-${VERSION}.arm64_sonoma.bottle.tar.gz | awk '{print $1}')
           echo "ARM64_SONOMA_SHA=${ARM64_SONOMA_SHA}" >> $GITHUB_OUTPUT
 
-          ARM64_MONTEREY_SHA=$(shasum -a 256 skipboi-${VERSION_NO_V}.arm64_monterey.bottle.tar.gz | awk '{print $1}')
+          ARM64_MONTEREY_SHA=$(shasum -a 256 skipboi-${VERSION}.arm64_monterey.bottle.tar.gz | awk '{print $1}')
           echo "ARM64_MONTEREY_SHA=${ARM64_MONTEREY_SHA}" >> $GITHUB_OUTPUT
 
-          ARM64_TAHOE_SHA=$(shasum -a 256 skipboi-${VERSION_NO_V}.arm64_tahoe.bottle.tar.gz | awk '{print $1}')
+          ARM64_TAHOE_SHA=$(shasum -a 256 skipboi-${VERSION}.arm64_tahoe.bottle.tar.gz | awk '{print $1}')
           echo "ARM64_TAHOE_SHA=${ARM64_TAHOE_SHA}" >> $GITHUB_OUTPUT
 
-          ARM64_SEQUOIA_SHA=$(shasum -a 256 skipboi-${VERSION_NO_V}.arm64_sequoia.bottle.tar.gz | awk '{print $1}')
+          ARM64_SEQUOIA_SHA=$(shasum -a 256 skipboi-${VERSION}.arm64_sequoia.bottle.tar.gz | awk '{print $1}')
           echo "ARM64_SEQUOIA_SHA=${ARM64_SEQUOIA_SHA}" >> $GITHUB_OUTPUT
 
-          X86_64_SONOMA_SHA=$(shasum -a 256 skipboi-${VERSION_NO_V}.x86_64_sonoma.bottle.tar.gz | awk '{print $1}')
+          X86_64_SONOMA_SHA=$(shasum -a 256 skipboi-${VERSION}.x86_64_sonoma.bottle.tar.gz | awk '{print $1}')
           echo "X86_64_SONOMA_SHA=${X86_64_SONOMA_SHA}" >> $GITHUB_OUTPUT
 
       - name: Extract version
         id: version
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/}
-          VERSION_NO_V=${VERSION#v}
-          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
-          echo "VERSION_NO_V=${VERSION_NO_V}" >> $GITHUB_OUTPUT
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
@@ -107,16 +99,16 @@ jobs:
           files: |
             .build/release/skipboi-macos.tar.gz
             .build/release/skipboi-macos.tar.gz.sha256
-            skipboi-${{ steps.version.outputs.VERSION_NO_V }}.arm64_sonoma.bottle.tar.gz
-            skipboi-${{ steps.version.outputs.VERSION_NO_V }}.arm64_sonoma.bottle.tar.gz.sha256
-            skipboi-${{ steps.version.outputs.VERSION_NO_V }}.arm64_monterey.bottle.tar.gz
-            skipboi-${{ steps.version.outputs.VERSION_NO_V }}.arm64_monterey.bottle.tar.gz.sha256
-            skipboi-${{ steps.version.outputs.VERSION_NO_V }}.arm64_tahoe.bottle.tar.gz
-            skipboi-${{ steps.version.outputs.VERSION_NO_V }}.arm64_tahoe.bottle.tar.gz.sha256
-            skipboi-${{ steps.version.outputs.VERSION_NO_V }}.arm64_sequoia.bottle.tar.gz
-            skipboi-${{ steps.version.outputs.VERSION_NO_V }}.arm64_sequoia.bottle.tar.gz.sha256
-            skipboi-${{ steps.version.outputs.VERSION_NO_V }}.x86_64_sonoma.bottle.tar.gz
-            skipboi-${{ steps.version.outputs.VERSION_NO_V }}.x86_64_sonoma.bottle.tar.gz.sha256
+            skipboi-${{ steps.version.outputs.VERSION }}.arm64_sonoma.bottle.tar.gz
+            skipboi-${{ steps.version.outputs.VERSION }}.arm64_sonoma.bottle.tar.gz.sha256
+            skipboi-${{ steps.version.outputs.VERSION }}.arm64_monterey.bottle.tar.gz
+            skipboi-${{ steps.version.outputs.VERSION }}.arm64_monterey.bottle.tar.gz.sha256
+            skipboi-${{ steps.version.outputs.VERSION }}.arm64_tahoe.bottle.tar.gz
+            skipboi-${{ steps.version.outputs.VERSION }}.arm64_tahoe.bottle.tar.gz.sha256
+            skipboi-${{ steps.version.outputs.VERSION }}.arm64_sequoia.bottle.tar.gz
+            skipboi-${{ steps.version.outputs.VERSION }}.arm64_sequoia.bottle.tar.gz.sha256
+            skipboi-${{ steps.version.outputs.VERSION }}.x86_64_sonoma.bottle.tar.gz
+            skipboi-${{ steps.version.outputs.VERSION }}.x86_64_sonoma.bottle.tar.gz.sha256
           body: |
             ## Installation
 

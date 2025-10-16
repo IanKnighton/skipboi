@@ -55,11 +55,9 @@ skipboi/
 ```
 
 ### **Generated Files Per Release**
-- `skipboi-1.2.0.arm64_sonoma.bottle.tar.gz` + SHA256
-- `skipboi-1.2.0.arm64_monterey.bottle.tar.gz` + SHA256  
-- `skipboi-1.2.0.x86_64_sonoma.bottle.tar.gz` + SHA256
-
-**Note:** Bottle filenames use version without 'v' prefix (e.g., `1.2.0` not `v1.2.0`) to match Homebrew's naming convention.
+- `skipboi-v1.2.0.arm64_sonoma.bottle.tar.gz` + SHA256
+- `skipboi-v1.2.0.arm64_monterey.bottle.tar.gz` + SHA256  
+- `skipboi-v1.2.0.x86_64_sonoma.bottle.tar.gz` + SHA256
 
 ### **Formula Integration**
 ```ruby
