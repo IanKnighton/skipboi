@@ -129,7 +129,7 @@ jobs:
             ```bash
             VERSION=${{ steps.version.outputs.VERSION }}
             DOWNLOAD_URL="https://github.com/IanKnighton/skipboi"
-            DOWNLOAD_URL="${DOWNLOAD_URL}/releases/download/${VERSION}/skipboi-macos.tar.gz"
+            DOWNLOAD_URL="${DOWNLOAD_URL}/releases/download/v${VERSION}/skipboi-macos.tar.gz"
             curl -L "${DOWNLOAD_URL}" | tar xz
             sudo mv skipboi /usr/local/bin/
             ```
