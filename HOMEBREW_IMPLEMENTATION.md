@@ -143,6 +143,8 @@ skipboi/
 - `skipboi-{version}.arm64_monterey.bottle.tar.gz` - Apple Silicon macOS Monterey  
 - `skipboi-{version}.x86_64_sonoma.bottle.tar.gz` - Intel macOS Sonoma
 
+**Note:** `{version}` does NOT include the 'v' prefix (e.g., `1.2.0` not `v1.2.0`). This matches Homebrew's bottle naming convention even though the git tag and root_url include the 'v' prefix.
+
 ### SHA256 Verification
 Each bottle includes SHA256 hash in the formula for security:
 ```ruby
