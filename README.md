@@ -226,7 +226,11 @@ end tell
 
 ### AirPods Control Setup
 
-The AirPods control feature requires setting up shortcuts in the macOS Shortcuts app. Here's how to set it up:
+The AirPods control feature requires setting up shortcuts in the macOS Shortcuts app. 
+
+**📖 For detailed setup instructions, see [AIRPODS_SETUP.md](AIRPODS_SETUP.md)**
+
+Quick overview:
 
 1. **Open the Shortcuts app** on your Mac
 
