@@ -60,6 +60,14 @@ class MusicController {
         case unmute
     }
     
+    enum AirPodsMode: String {
+        case cycle = "AirPods Cycle Modes"
+        case transparency = "AirPods Transparency"
+        case adaptive = "AirPods Adaptive"
+        case noiseCancellation = "AirPods Noise Cancellation"
+        case off = "AirPods Off"
+    }
+    
     /// Execute an AppleScript command for Apple Music or system volume
     func execute(_ command: Command) -> Bool {
         let script: String
@@ -167,6 +175,32 @@ class MusicController {
         print("   Artist: \(info.artist)")
         print("   Album:  \(info.album)")
     }
+    
+    /// Execute an AirPods mode change via Shortcuts app
+    func executeAirPodsMode(_ mode: AirPodsMode) -> Bool {
+        let script = """
+        tell application "Shortcuts"
+            run shortcut "\(mode.rawValue)"
+        end tell
+        """
+        
+        guard let appleScript = NSAppleScript(source: script) else {
+            print("Error: Failed to create AppleScript")
+            return false
+        }
+        
+        var error: NSDictionary?
+        appleScript.executeAndReturnError(&error)
+        
+        if let error = error {
+            print("Error executing AppleScript: \(error)")
+            print("\n⚠️  Note: This feature requires shortcuts to be set up in the Shortcuts app.")
+            print("   Please see the README for instructions on setting up AirPods shortcuts.")
+            return false
+        }
+        
+        return true
+    }
 }
 
 @main
@@ -260,6 +294,43 @@ struct Skipboi {
             if success {
                 print("🔊 Unmuted")
             }
+        case "airpods":
+            // Handle AirPods commands with optional flags
+            if arguments.count > 2 {
+                let flag = arguments[2]
+                switch flag {
+                case "-t", "--transparency":
+                    success = controller.executeAirPodsMode(.transparency)
+                    if success {
+                        print("🎧 AirPods Transparency mode toggled")
+                    }
+                case "-a", "--adaptive":
+                    success = controller.executeAirPodsMode(.adaptive)
+                    if success {
+                        print("🎧 AirPods Adaptive mode toggled")
+                    }
+                case "-n", "--noise-cancellation":
+                    success = controller.executeAirPodsMode(.noiseCancellation)
+                    if success {
+                        print("🎧 AirPods Noise Cancellation toggled")
+                    }
+                case "-o", "--off":
+                    success = controller.executeAirPodsMode(.off)
+                    if success {
+                        print("🎧 AirPods Noise Control turned off")
+                    }
+                default:
+                    print("Error: Unknown AirPods flag '\(flag)'")
+                    print("Valid flags: -t/--transparency, -a/--adaptive, -n/--noise-cancellation, -o/--off")
+                    exit(1)
+                }
+            } else {
+                // No flag provided, cycle through modes
+                success = controller.executeAirPodsMode(.cycle)
+                if success {
+                    print("🎧 AirPods mode cycled")
+                }
+            }
         case "help", "-h", "--help":
             showUsage()
             exit(0)
@@ -277,12 +348,12 @@ struct Skipboi {
     
     static func showUsage() {
         print("""
-        skipboi - A simple macOS CLI for controlling Apple Music
+        skipboi - A simple macOS CLI for controlling Apple Music and AirPods
         
         Usage:
-            skipboi <command>
+            skipboi <command> [options]
         
-        Commands:
+        Music Commands:
             play                Start playing the current track
             pause               Pause the current track
             playpause, toggle   Toggle between play and pause
@@ -298,6 +369,15 @@ struct Skipboi {
             volume-down, volumedown, voldown, quieter   Decrease system volume
             mute                Mute system audio
             unmute              Unmute system audio
+        
+        AirPods Commands:
+            airpods             Cycle through AirPods noise control modes
+            airpods -t, --transparency           Toggle Transparency mode
+            airpods -a, --adaptive               Toggle Adaptive mode
+            airpods -n, --noise-cancellation     Toggle Noise Cancellation mode
+            airpods -o, --off                    Turn off Noise Control
+        
+        Other Commands:
             version, -v, --version              Show version information
             help, -h, --help    Show this help message
         
@@ -310,7 +390,13 @@ struct Skipboi {
             skipboi repeat-one  # Enable repeat one
             skipboi volume-up   # Increase volume
             skipboi mute        # Mute audio
+            skipboi airpods     # Cycle AirPods modes
+            skipboi airpods -t  # Toggle Transparency mode
+            skipboi airpods -a  # Toggle Adaptive mode
             skipboi version     # Show version
+        
+        Note: AirPods commands require shortcuts to be set up in the Shortcuts app.
+              See the README for detailed instructions on setting up AirPods shortcuts.
         """)
     }
 }

@@ -16,6 +16,7 @@ A simple macOS CLI that allows you to start, stop, and skip songs playing in App
 - 🔀 Shuffle control (enable/disable)
 - 🔁 Repeat control (off/all/one)
 - 🔊 Volume control (up/down/mute/unmute)
+- 🎧 AirPods noise control (cycle/transparency/adaptive/noise cancellation/off)
 - 🎯 Native Swift implementation using AppleScript
 - 🚀 Fast and lightweight
 - 💻 Perfect for staying in your terminal workflow
@@ -25,6 +26,7 @@ A simple macOS CLI that allows you to start, stop, and skip songs playing in App
 - macOS 10.15 (Catalina) or later
 - Swift 6.1 or later (for building from source)
 - Apple Music app installed
+- For AirPods control: macOS 12.0 (Monterey) or later and compatible AirPods
 
 ## Installation
 
@@ -103,8 +105,25 @@ skipboi <command>
 | `volume-down` | `volumedown`, `voldown`, `quieter` | Decrease system volume   |
 | `mute`        | -                           | Mute system audio               |
 | `unmute`      | -                           | Unmute system audio             |
+| `airpods`     | -                           | Cycle through AirPods noise control modes |
 | `version`     | `-v`, `--version`           | Show version information        |
 | `help`        | `-h`, `--help`              | Show help message               |
+
+### AirPods Commands
+
+The `airpods` command supports flags for specific mode control:
+
+| Command                    | Description                               |
+| -------------------------- | ----------------------------------------- |
+| `skipboi airpods`          | Cycle through noise control modes         |
+| `skipboi airpods -t`       | Toggle Transparency mode                  |
+| `skipboi airpods --transparency` | Toggle Transparency mode            |
+| `skipboi airpods -a`       | Toggle Adaptive mode                      |
+| `skipboi airpods --adaptive` | Toggle Adaptive mode                    |
+| `skipboi airpods -n`       | Toggle Noise Cancellation                 |
+| `skipboi airpods --noise-cancellation` | Toggle Noise Cancellation   |
+| `skipboi airpods -o`       | Turn off Noise Control                    |
+| `skipboi airpods --off`    | Turn off Noise Control                    |
 
 ### Examples
 
@@ -154,6 +173,15 @@ skipboi mute
 # Unmute audio
 skipboi unmute
 
+# Cycle through AirPods noise control modes
+skipboi airpods
+
+# Enable/toggle Transparency mode
+skipboi airpods -t
+
+# Enable/toggle Adaptive mode
+skipboi airpods -a
+
 # Show version
 skipboi version
 
@@ -195,6 +223,38 @@ tell application "Music"
     play
 end tell
 ```
+
+### AirPods Control Setup
+
+The AirPods control feature requires setting up shortcuts in the macOS Shortcuts app. 
+
+**📖 For detailed setup instructions, see [AIRPODS_SETUP.md](AIRPODS_SETUP.md)**
+
+Quick overview:
+
+1. **Open the Shortcuts app** on your Mac
+
+2. **Create shortcuts** for each AirPods mode you want to control. You'll need to create shortcuts with these exact names:
+   - `AirPods Cycle Modes` - Cycles through available noise control modes
+   - `AirPods Transparency` - Enables/toggles Transparency mode
+   - `AirPods Adaptive` - Enables/toggles Adaptive mode
+   - `AirPods Noise Cancellation` - Enables/toggles Noise Cancellation
+   - `AirPods Off` - Turns off all noise control
+
+3. **Create each shortcut:**
+   - Click the `+` button to create a new shortcut
+   - Search for "Set Listening Mode" action (available when AirPods are connected)
+   - Add the action and select your AirPods device
+   - Choose the desired listening mode (Transparency, Noise Cancellation, Off, or Adaptive)
+   - Name the shortcut exactly as shown above (e.g., "AirPods Transparency")
+
+4. **Download pre-made shortcuts** (optional):
+   - You can also download and customize shortcuts from the Apple Shortcuts Gallery or community sources
+   - Make sure to rename them to match the expected names listed above
+
+**Note:** The shortcuts must be created for each mode you want to use. If you only want to cycle through modes, you only need to create the "AirPods Cycle Modes" shortcut. The other shortcuts are optional and only needed if you want to directly toggle specific modes.
+
+**Important:** Your AirPods must be connected to your Mac for these shortcuts to work. The Shortcuts app requires at least macOS Monterey (12.0) or later.
 
 ## Version Information
 
@@ -377,3 +437,22 @@ If `/usr/local/bin` is not in your PATH, add it to your shell configuration file
 ```bash
 export PATH="/usr/local/bin:$PATH"
 ```
+
+### AirPods commands not working
+
+If you get an error when running AirPods commands:
+
+1. **Verify Shortcuts are created**: Open the Shortcuts app and confirm you have shortcuts with the exact names:
+   - `AirPods Cycle Modes`
+   - `AirPods Transparency`
+   - `AirPods Adaptive`
+   - `AirPods Noise Cancellation`
+   - `AirPods Off`
+
+2. **Check macOS version**: AirPods control requires macOS Monterey (12.0) or later
+
+3. **Ensure AirPods are connected**: Your AirPods must be connected to your Mac for the shortcuts to work
+
+4. **Grant permissions**: The first time you run an AirPods command, macOS may prompt you to allow Terminal (or your terminal emulator) to control the Shortcuts app. Make sure to allow this permission.
+
+5. **Test shortcuts manually**: Open the Shortcuts app and try running the shortcuts manually to ensure they work before using them with skipboi
